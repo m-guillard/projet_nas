@@ -19,6 +19,9 @@ R3(config-if)#no sh
 R3(config-if)#exit
 Vérif en pingant d'un bout à l'autre
 
+Sauvegarder la configuration du routeur
+R#write 
+
 Conf Loopback0 sur routeur X
 R #config terminal
 > R(config) #interface Loopback0
