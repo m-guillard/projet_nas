@@ -42,6 +42,13 @@ R #config terminal
   > R(config-if) #mpls ip
   > R(config-if) #exit
 
+Conf BGP
+R #conf ter
+Router(config)# router bgp <as-number>
+Router(config-route)# bgp routeur-id <X.X.X.X>
+Routeur(config-router)# neighbor <ipv4-address> remote-as <as-number>
+Routeur(config-router)# address-family ipv4 unicast
+Router(config-router-af)# neighbor <ipv4-address> activate
 
 Raccourcis :
 - config terminal : conf ter
