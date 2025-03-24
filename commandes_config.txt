@@ -23,3 +23,4 @@ Raccourcis :
 - config terminal : conf ter
 - GigabitEthernet1/0 : G1/0
 - interface : int
+- no shutdown : no sh
