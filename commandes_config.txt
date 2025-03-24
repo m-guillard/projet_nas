@@ -5,3 +5,4 @@ R #config terminal
 > R(config) #interface GigabitEthernet1/0
   > R(config-if) #adress 192.168.1.1 255.255.255.0
   > R(config-if) #no shutdown
+  > R(config-if) #exit
