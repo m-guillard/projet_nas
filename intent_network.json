@@ -4,7 +4,7 @@
             "id_AS":"1",
             "type_relation": "provider",
             "prefixe_reseau": "192.168.",
-            "prefixe_loopback": "127.0",
+            "masque_reseau": "255.255.255.0",
             "protocole_routage":["RIP","iBGP"],
             "communauté" : [
                 {

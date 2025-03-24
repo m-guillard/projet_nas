@@ -25,27 +25,28 @@ def definir_liens_routeurs(donnees_reseau):
     for as_data in donnees_reseau["AS"]:
         id_as = as_data["id_AS"]
         prefixe_reseau = as_data["prefixe_reseau"]
-        prefixe_loopback = as_data["prefixe_loopback"]
 
         # Parcours des routeurs dans l'AS
         for routeur in as_data["routeur"]:
             routeur_num = routeur["nom"]
             adresse_as = as_data["prefixe_reseau"]
             protocoles = as_data["protocole_routage"]
+            masque = as_data["masque_reseau"]
 
             # Si le routeur n'a aucun voisin, on l'initialise
             if routeur_num not in liens:
                 liens[routeur_num] = []
 
             # Ajouter une adresse loopback pour le routeur
-            adresse_loopback = f"{prefixe_loopback}.{routeur_num}.1"
+            adresse_loopback = f"{routeur_num}.{routeur_num}.{routeur_num}.{routeur_num}"
             liens[routeur_num].append({
                 "nom_voisin": routeur_num,
                 "interface": "Loopback0",
                 "adresse_interface": adresse_loopback,
                 "AS": id_as,
                 "adresse_AS": adresse_as,
-                "protocole_routage": protocoles
+                "protocole_routage": protocoles,
+                "masque": "255.255.255.255" # toutes les adresses loopback sont en /32
             })
 
             # On regarde pour tous les routeurs de l'AS
@@ -81,7 +82,8 @@ def definir_liens_routeurs(donnees_reseau):
                             "adresse_interface": adresse_lien_source,
                             "AS": id_as,
                             "adresse_AS": adresse_as,
-                            "protocole_routage": protocoles
+                            "protocole_routage": protocoles,
+                            "masque": masque
                         })
 
                         # Ajouter le lien pour le routeur voisin
@@ -93,7 +95,8 @@ def definir_liens_routeurs(donnees_reseau):
                             "adresse_interface": adresse_lien_dest,
                             "AS": id_as,
                             "adresse_AS": adresse_as,
-                            "protocole_routage": protocoles
+                            "protocole_routage": protocoles,
+                            "masque": masque
                         })
 
                 else:
@@ -145,7 +148,7 @@ def invariable_debut(nom_routeur, txt_routeur):
 
 def invariable_milieu():
     """
-    Renvoie la configuration du routeur entre bgp et rip/ospf qui est identique pour tous les routeurs
+    Renvoie la configuration du routeur entre bgp et ospf qui est identique pour tous les routeurs
     Return(str): texte de configuration à jour
     """
     txt_routeur = "ip forward-protocol nd\n"
@@ -193,7 +196,7 @@ def liste_routeurs_bordure(data):
             liste.append(r["nom"])
     return liste
 
-def interface(nom_interface, ip, protocole):
+def interface(nom_interface, ip, protocole, masque):
     """
     Renvoie la configuration de l'interface
     Paramètres:
@@ -214,24 +217,13 @@ def interface(nom_interface, ip, protocole):
         txt_routeur += " duplex full\n"
 
     if ip != "": # L'interface est connectée à un routeur
-        txt_routeur += " ipv6 address " + ip + "\n"
-        if nom_interface != "Loopback0":
-            txt_routeur += " ipv6 enable\n"
-
-        if "RIP" in protocole and "eBGP" not in protocole:
-            txt_routeur += " ipv6 rip X enable\n"
+        txt_routeur += " ip address " + ip + " " + masque + "\n"
 
         if "OSPF" in protocole and "eBGP" not in protocole:
             txt_routeur += " ipv6 ospf 31 area 0\n"
 
     txt_routeur += "!\n"
 
-    return txt_routeur
-
-def rip():
-    """Renvoie la configuration du protocole RIP"""
-    txt_routeur = "ipv6 router rip X\n"
-    txt_routeur += " redistribute connected\n"
     return txt_routeur
 
 def communaute():
@@ -389,15 +381,12 @@ def main():
     for nom_as, liste_rout in dic_rout_as.items():
         for r in liste_rout:
             txt_routeur = invariable_debut(r, "")
-            txt_rip = ""
             txt_ospf = ""
             bool_bordure = r in routeurs_bordure
 
             # Ajout des interfaces et protocoles
             for i in dico_liens[r]:
-                txt_routeur += interface(i["interface"], i["adresse_interface"], i["protocole_routage"])
-                if "RIP" in i["protocole_routage"] and "eBGP" not in i["protocole_routage"]:
-                    txt_rip = rip()
+                txt_routeur += interface(i["interface"], i["adresse_interface"], i["protocole_routage"], i["masque"])
                 if "OSPF" in i["protocole_routage"] and "eBGP" not in i["protocole_routage"]:
                     txt_ospf = ospf(r)
 
@@ -406,7 +395,7 @@ def main():
 
             # Ajout sections communes
             txt_routeur += invariable_milieu()
-            txt_routeur += txt_rip + txt_ospf
+            txt_routeur += txt_ospf
             txt_routeur += invariable_fin()
 
             # Ecriture dans le fichier de config
