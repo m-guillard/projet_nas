@@ -1,0 +1,58 @@
+{
+    "AS": [
+        {
+            "id_AS":"1",
+            "type_relation": "provider",
+            "prefixe_reseau": "2001:100:1::/128",
+            "prefixe_loopback": "2001::/128",
+            "protocole_routage":["RIP","iBGP"],
+            "communauté" : [
+                {
+                    "Providers" : [2],
+                    "Peers" : [],
+                    "Customers" : [3,4],
+                    "Politique_filtrage" : "out"
+                }
+            ],
+            "routeur" : [
+                {
+                    "nom":"1",
+                    "connecte": {
+                        "FastEthernet0/0":"",
+                        "GigabitEthernet1/0":"2",
+                        "GigabitEthernet2/0":""
+                    }
+                },
+                {
+                    "nom":"2",
+                    "connecte":{
+                        "FastEthernet0/0":"",
+                        "GigabitEthernet1/0":"1",
+                        "GigabitEthernet2/0":"3"
+                    }
+                },
+                {
+                    "nom":"3",
+                    "connecte": {
+                        "FastEthernet0/0":"",
+                        "GigabitEthernet1/0":"2",
+                        "GigabitEthernet2/0":"4"
+                    }
+                },
+                {
+                    "nom":"4",
+                    "connecte": {
+                        "FastEthernet0/0":"",
+                        "GigabitEthernet1/0":"3",
+                        "GigabitEthernet2/0":""
+                    }
+                }  
+            ]
+        }
+    ],
+
+    "interAS": [
+    ]
+
+        
+}
