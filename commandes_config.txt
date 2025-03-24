@@ -14,7 +14,7 @@ R3(config)#router ospf 1
 R3(config-router)#router-id 3.3.3.3
 R3(config-router)#exit
 R3(config)#interface g1/0
-R3(config-if)#ip ospf 1 area 0
+R3(config-if)#ip ospf 1 area 0                        (ospf 1 = "nom" de l'ospf, il peut y en avoir plusieurs par interfaces donc utile pour les différencier. Area 0 = ici on taffe dans le backbone)
 R3(config-if)#no sh
 R3(config-if)#exit
 Vérif en pingant d'un bout à l'autre
@@ -23,8 +23,13 @@ Conf Loopback0 sur routeur X
 R #config terminal
 > R(config) #interface Loopback0
   > R(config-if) #ip address X.X.X.X
-  > R(config-if) #no shutdown
+  > R(config-if) #ip ospf 1 area 0 (on met ospf sur l'interface, on peut ping)
+  > R(configif) #no shutdown
   > R(config-if) #exit
+
+
+Conf LDP :
+
 
 
 Raccourcis :
