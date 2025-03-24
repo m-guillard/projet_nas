@@ -42,13 +42,6 @@ R #config terminal
   > R(config-if) #mpls ip
   > R(config-if) #exit
 
-Configurer LDP :
-R>enable
-R#conf ter
-Router(config)# mpls ip
-Router(config)# mpls label protocol ldp
-Router(config)# interface g1/0
-Router(config-if)# mpls ip
 
 Raccourcis :
 - config terminal : conf ter
@@ -57,7 +50,7 @@ Raccourcis :
 - no shutdown : no sh
 
 
-
+-------------------------------------------------------------------- NOTES --------------------------------------------------------------------
 Loopback :
 Sert au routeur à s'envoyer des trucs, pour vérif s'il marche
 Sert aussi à atteindre un routeur quelque soient l'état de ses interfaces (déso BGP), s'il est encore dans le réseau. DOnc on dit à la session BGP qu'il faut parler à la Loopback avec notre Loopback, et gngngn
