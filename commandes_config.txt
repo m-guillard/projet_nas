@@ -29,7 +29,13 @@ R #config terminal
 
 
 Conf LDP :
-
+R #config terminal
+> R(config) #mpls ip
+> R(config) #mpls label protocol ldp
+(puis pour chaque interface :)
+> R(config) #interface g1/0
+  > R(config-if) #mpls ip
+  > R(config-if) #exit
 
 
 Raccourcis :
