@@ -1,5 +1,7 @@
 Toutes les commandes utiles pour configurer les routeurs
 
+Lien utile : https://www.cisco.com/c/en/us/td/docs/ios/mpls/configuration/guide/convert/mp_ldp_book/mp_ldp_overview.html
+
 Configure adresse IPv4 pour chaque interface
 R #config terminal
 > R(config) #interface GigabitEthernet1/0
@@ -40,6 +42,13 @@ R #config terminal
   > R(config-if) #mpls ip
   > R(config-if) #exit
 
+Configurer LDP :
+R>enable
+R#conf ter
+Router(config)# mpls ip
+Router(config)# mpls label protocol ldp
+Router(config)# interface g1/0
+Router(config-if)# mpls ip
 
 Raccourcis :
 - config terminal : conf ter
