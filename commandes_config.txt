@@ -17,3 +17,9 @@ R3(config)#interface g1/0
 R3(config-if)#ip ospf 1 area 0
 R3(config-if)#no sh
 R3(config-if)#exit
+
+
+Raccourcis :
+- config terminal : conf ter
+- GigabitEthernet1/0 : G1/0
+- interface : int
