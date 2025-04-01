@@ -51,7 +51,7 @@ Routeur(config-router)# address-family ipv4 unicast
 Router(config-router-af)# neighbor <ipv4-address> activate
 
 Conf VRF
-https://netseccloud.com/how-to-configure-vrf-on-cisco-routers-step-by-step-tutorial
+https://netseccloud.com/setting-up-vrf-on-cisco-routers-a-step-by-step-tutorial
 
 CONF CE-PE
 PE
