@@ -45,13 +45,13 @@ R #config terminal
 Conf BGP Loopback to Loopback : ex de PE1 à PE2 (pas sur routeurs de coeur) (AS = 1, PE1 Loopback0 = 1.1.1.1, id router PE1 = 1.1.1.1, PE2 Loopback0 = 4.4.4.4, PE2 id = 4.4.4.4 bah oui on est des zozos)
 R #conf ter
 Router(config)# router bgp <as-number>
-Router(config-route)# bgp routeur-id <X.X.X.X>
-Routeur(config-router)# neighbor <adresse looupebach> remote-as <as-number>
-Routeur(config-router)# neighbor <adresse looupebach> update-source Loopback0
+Router(config-route)# bgp router-id <X.X.X.X>
+Router(config-router)# neighbor <adresse looupebach> remote-as <as-number>
+Router(config-router)# neighbor <adresse looupebach> update-source Loopback0
 
           ex sur PE1 :
               Router(config)# router bgp 1
-              Router(config-route)# bgp routeur-id 1.1.1.1
+              Router(config-route)# bgp router-id 1.1.1.1
               Routeur(config-router)# neighbor 4.4.4.4 remote-as 1
               Routeur(config-router)# neighbor 4.4.4.4 update-source Loopback0
 
@@ -60,7 +60,7 @@ Routeur(config-router)# neighbor <adresse looupebach> update-source Loopback0
 Conf BGP
 R #conf ter
 Router(config)# router bgp <as-number>
-Router(config-route)# bgp routeur-id <X.X.X.X>
+Router(config-route)# bgp router-id <X.X.X.X>
 Routeur(config-router)# neighbor <ipv4-address> remote-as <as-number>
 Routeur(config-router)# address-family ipv4 unicast
 Router(config-router-af)# neighbor <ipv4-address> activate
@@ -72,7 +72,7 @@ CONF CE-PE
 PE
 R #conf ter
 Router(config)# router bgp <as-number>
-Router(config-route)# bgp routeur-id <X.X.X.X>
+Router(config-route)# bgp router-id <X.X.X.X>
 Routeur(config-router)# address-family ipv4 vrf <nom vrf>
 Router(config-router-af)# neighbor <ipv4-address> activate
 Routeur(config-router-af)# neighbor <ipv4-address> remote-as <as-number>
