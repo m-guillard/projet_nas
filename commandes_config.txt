@@ -46,14 +46,21 @@ Conf BGP Loopback to Loopback : ex de PE1 à PE2 (pas sur routeurs de coeur) (AS
 R #conf ter
 Router(config)# router bgp <as-number>
 Router(config-route)# bgp router-id <X.X.X.X>
-Router(config-router)# neighbor <adresse looupebach> remote-as <as-number>
-Router(config-router)# neighbor <adresse looupebach> update-source Loopback0
+Router(config-router)# neighbor <adresse loopbach> remote-as <as-number>
+Router(config-router)# neighbor <adresse loopbach> update-source Loopback0
+Routeur(config-router)# address-family vpnv4
+Router(config-router-af)# neighbor <adresse loopbach> activate
+Router(config-router-af)# neighbor <adresse loopbach> send-community both
+Router(config-router-af)#exit
+Routeur(config-router)# address-family ipv4 unicast
+Router(config-router-af)# neighbor <adresse loopbach> activate
+Router(config-router-af)# neighbor <adresse loopbach> send-community both
 
-          ex sur PE1 :
-              Router(config)# router bgp 1
-              Router(config-route)# bgp router-id 1.1.1.1
-              Routeur(config-router)# neighbor 4.4.4.4 remote-as 1
-              Routeur(config-router)# neighbor 4.4.4.4 update-source Loopback0
+ex sur PE1 :
+    Router(config)# router bgp 1
+    Router(config-route)# bgp router-id 1.1.1.1
+    Routeur(config-router)# neighbor 4.4.4.4 remote-as 1
+    Routeur(config-router)# neighbor 4.4.4.4 update-source Loopback0
 
 
 
@@ -65,8 +72,18 @@ Routeur(config-router)# neighbor <ipv4-address> remote-as <as-number>
 Routeur(config-router)# address-family ipv4 unicast
 Router(config-router-af)# neighbor <ipv4-address> activate
 
-Conf VRF
+Conf VRF sur PE
 https://netseccloud.com/setting-up-vrf-on-cisco-routers-a-step-by-step-tutorial
+
+R#conf ter
+Router(config)# ip vrf [VRF-NAME]
+Router(config-vrf)# rd [ASN]:[XXX]
+Router(config-vrf)# route-target import [ASN]:[YYY]
+Router(config-vrf)# route-target export [ASN]:[YYY]
+Router(config)# interface [INTERFACE-ID]
+Router(config-if)# ip vrf forwarding [VRF-NAME]
+Router(config-if)# ip address [IP-ADDRESS] [SUBNET-MASK]
+Router(config-if)# no shutdown
 
 CONF CE-PE
 PE
@@ -77,8 +94,16 @@ Routeur(config-router)# address-family ipv4 vrf <nom vrf>
 Router(config-router-af)# neighbor <ipv4-address> activate
 Routeur(config-router-af)# neighbor <ipv4-address> remote-as <as-number>
 
+
 CE
 meme chose que bgp
+R #conf ter
+Router(config)# router bgp <as-number>
+Router(config-route)# bgp router-id <X.X.X.X>
+Routeur(config-router)# neighbor <ipv4-address> remote-as <as-number>
+Routeur(config-router)# address-family ipv4 unicast
+Router(config-router-af)# neighbor <ipv4-address> activate
+Router(config-router-af)# redistribute connected
 
 Raccourcis :
 - config terminal : conf ter
