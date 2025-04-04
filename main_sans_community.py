@@ -301,7 +301,7 @@ def interface(nom_interface, ip, protocole, masque):
         txt_routeur += " ip address " + ip + " " + masque + "\n"
 
         if "OSPF" in protocole and "eBGP" not in protocole:
-            txt_routeur += " ipv6 ospf 31 area 0\n"
+            txt_routeur += " ip ospf 1 area 0\n"
 
     txt_routeur += "!\n"
 
@@ -480,6 +480,9 @@ def main():
 
             txt_routeur = invariable_debut(dico_nom_id[r], "")
             txt_routeur += txt_vrf
+            txt_routeur += invariable2()
+            txt_routeur += txt_mpls
+            txt_routeur += invariable3()
 
             # Config bgp
             txt_routeur += bgp(r, dico_liens, dic_rout_as, nom_as, bool_bordure)
