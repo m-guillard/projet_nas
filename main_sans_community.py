@@ -278,6 +278,14 @@ def liste_routeurs_bordure(data):
             liste.append(r["id_routeur"])
     return liste
 
+def dic_vrf(data):
+    """
+    
+    Paramètre:
+    - data: 
+    """
+
+
 def interface(nom_interface, ip, protocole, masque):
     """
     Renvoie la configuration de l'interface
@@ -302,7 +310,9 @@ def interface(nom_interface, ip, protocole, masque):
         txt_routeur += " ip address " + ip + " " + masque + "\n"
 
         if "OSPF" in protocole and "eBGP" not in protocole:
-            txt_routeur += " ipv6 ospf 31 area 0\n"
+            txt_routeur += " ip ospf 1 area 0\n"
+
+        if "VRF"
 
     txt_routeur += "!\n"
 
@@ -350,7 +360,6 @@ def bgp(nom_routeur, voisins, routeur_dans_as, nom_as, routeur_bordure):
     id_routeur = ((nom_routeur+".")*4)[:-1]
     txt_routeur += " bgp router-id " + id_routeur + "\n"
     txt_routeur += " bgp log-neighbor-changes\n"
-    txt_routeur += " no bgp default ipv4-unicast\n"
 
     # Adresses loopback des routeurs dans l'AS et adresses des voisins ne faisant pas partie de l'AS
     adresses_bgp = []
@@ -454,6 +463,7 @@ def main():
     dico_liens = definir_liens_routeurs(dico_json)
     dic_rout_as = dic_routeurs_par_as(dico_json)
     routeurs_bordure = liste_routeurs_bordure(dico_json)
+    routeurs_vrf = dic_vrf(dico_json["interAS"])
 
     chemin_config = "Config"  # Dossier où se trouvent les fichiers de configuration générés
 
@@ -481,6 +491,9 @@ def main():
 
             txt_routeur = invariable_debut(dico_nom_id[r], "")
             txt_routeur += txt_vrf
+            txt_routeur += invariable2()
+            txt_routeur += txt_mpls
+            txt_routeur += invariable3()
 
             # Config bgp
             txt_routeur += bgp(r, dico_liens, dic_rout_as, nom_as, bool_bordure)
