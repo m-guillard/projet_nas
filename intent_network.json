@@ -2,56 +2,170 @@
     "AS": [
         {
             "id_AS":"1",
-            "type_relation": "provider",
             "prefixe_reseau": "192.168.",
-            "masque_reseau": "255.255.255.0",
-            "protocole_routage":["RIP","iBGP"],
-            "communauté" : [
-                {
-                    "Providers" : [2],
-                    "Peers" : [],
-                    "Customers" : [3,4],
-                    "Politique_filtrage" : "out"
-                }
-            ],
+            "masque_reseau": "255.255.255.248",
+            "protocole_routage":["OSPF","iBGP"],
             "routeur" : [
                 {
-                    "nom":"1",
+                    "nom": "PE1",
+                    "id_routeur": "1",
                     "connecte": {
                         "FastEthernet0/0":"",
                         "GigabitEthernet1/0":"2",
-                        "GigabitEthernet2/0":""
+                        "GigabitEthernet2/0":"",
+                        "GigabitEthernet3/0":""
                     }
                 },
                 {
-                    "nom":"2",
-                    "connecte":{
+                    "nom": "P1",
+                    "id_routeur": "2",
+                    "connecte": {
                         "FastEthernet0/0":"",
                         "GigabitEthernet1/0":"1",
-                        "GigabitEthernet2/0":"3"
+                        "GigabitEthernet2/0":"3",
+                        "GigabitEthernet3/0":""
                     }
                 },
                 {
-                    "nom":"3",
+                    "nom": "P2",
+                    "id_routeur": "3",
                     "connecte": {
                         "FastEthernet0/0":"",
                         "GigabitEthernet1/0":"2",
-                        "GigabitEthernet2/0":"4"
+                        "GigabitEthernet2/0":"4",
+                        "GigabitEthernet3/0":""
                     }
                 },
                 {
-                    "nom":"4",
+                    "nom": "PE2",
+                    "id_routeur": "4",
                     "connecte": {
                         "FastEthernet0/0":"",
                         "GigabitEthernet1/0":"3",
-                        "GigabitEthernet2/0":""
+                        "GigabitEthernet2/0":"",
+                        "GigabitEthernet3/0":""
                     }
                 }  
+            ]
+        },
+        {
+            "id_AS":"2",
+            "prefixe_reseau": "192.170.",
+            "masque_reseau": "255.255.255.248",
+            "protocole_routage":["OSPF","iBGP"],
+            "routeur" : [
+                {
+                    "nom": "CE1",
+                    "id_routeur": "5",
+                    "connecte": {
+                        "FastEthernet0/0":"",
+                        "GigabitEthernet1/0":"",
+                        "GigabitEthernet2/0":"",
+                        "GigabitEthernet3/0":""
+                    }
+                },
+            ]
+        },
+        {
+            "id_AS":"3",
+            "prefixe_reseau": "192.171.",
+            "masque_reseau": "255.255.255.248",
+            "protocole_routage":["OSPF","iBGP"],
+            "routeur" : [
+                {
+                    "nom": "CE2",
+                    "id_routeur": "6",
+                    "connecte": {
+                        "FastEthernet0/0":"",
+                        "GigabitEthernet1/0":"",
+                        "GigabitEthernet2/0":"",
+                        "GigabitEthernet3/0":""
+                    }
+                },
+            ]
+        },
+        {
+            "id_AS":"4",
+            "prefixe_reseau": "192.172.",
+            "masque_reseau": "255.255.255.248",
+            "protocole_routage":["OSPF","iBGP"],
+            "routeur" : [
+                {
+                    "nom": "CE3",
+                    "id_routeur": "7",
+                    "connecte": {
+                        "FastEthernet0/0":"",
+                        "GigabitEthernet1/0":"",
+                        "GigabitEthernet2/0":"",
+                        "GigabitEthernet3/0":""
+                    }
+                },
+            ]
+        },
+        {
+            "id_AS":"5",
+            "prefixe_reseau": "192.173.",
+            "masque_reseau": "255.255.255.248",
+            "protocole_routage":["OSPF","iBGP"],
+            "routeur" : [
+                {
+                    "nom": "CE4",
+                    "id_routeur": "8",
+                    "connecte": {
+                        "FastEthernet0/0":"",
+                        "GigabitEthernet1/0":"",
+                        "GigabitEthernet2/0":""
+                    }
+                },
             ]
         }
     ],
 
     "interAS": [
+        {
+            "prefixe_reseau":"192.169.",
+            "protocole_routage":["eBGP"],
+            "routeur":[
+                {
+                    "nom": "5",
+                    "connecte":{
+                        "GigabitEthernet1/0":"1"
+                    }
+                },
+                {
+                    "nom": "7",
+                    "connecte":{
+                        "GigabitEthernet1/0":"1"
+                    }
+                },
+                {
+                    "nom": "1",
+                    "connecte":{
+                        "GigabitEthernet2/0":"5",
+                        "GigabitEthernet3/0":"7"
+                    }
+                },
+                {
+                    "nom": "6",
+                    "connecte":{
+                        "GigabitEthernet1/0":"4"
+                    }
+                },
+                {
+                    "nom": "8",
+                    "connecte":{
+                        "GigabitEthernet1/0":"4"
+                    }
+                },
+                {
+                    "nom": "4",
+                    "connecte":{
+                        "GigabitEthernet2/0":"6",
+                        "GigabitEthernet3/0":"8"
+                    }
+                }
+            ]
+        }
     ]
 
         
