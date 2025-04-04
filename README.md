@@ -8,7 +8,6 @@
     - Rajouter nom en gardant numéro routeur
     - Configuration VRF
 - Ajouter fonctionnalité
-    - Ligne de mpls au début
     - Revoir adressage ipv4 Loopback/classique
     - mpls ip dans les interfaces
     - Interface vrf

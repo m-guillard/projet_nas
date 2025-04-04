@@ -29,7 +29,6 @@ def definir_liens_routeurs(donnees_reseau):
         # Parcours des routeurs dans l'AS
         for routeur in as_data["routeur"]:
             routeur_num = routeur["id_routeur"]
-            nom_routeur = routeur["nom"]
             adresse_as = as_data["prefixe_reseau"]
             protocoles = as_data["protocole_routage"]
             masque = as_data["masque_reseau"]
@@ -118,7 +117,6 @@ def definir_liens_routeurs(donnees_reseau):
         prefixe_reseau = inter_as["prefixe_reseau"]
         for routeur in inter_as["routeur"]:
             routeur_num = routeur["id_routeur"]
-            nom_routeur = routeur["nom"]
             protocoles = []  # Initialisation de la liste des protocoles à vide
             adresse_as = f"{prefixe_reseau}.{compteur_lien}.1"
 
@@ -181,6 +179,14 @@ def definir_liens_routeurs(donnees_reseau):
     afficher_dico(liens, "Liens et adresses IP des routeurs :")
     return liens
 
+def definir_nom_id(dico):
+    dico_nom = {}
+    for a in dico["AS"]:
+        for r in a:
+            dico_nom[r["id_routeur"]] = r["nom"]
+
+    return dico_nom
+
 def point_excl(nb):
     """Renvoie nb points d'exclamation avec saut de ligne"""
     return "!\n"*nb
@@ -206,9 +212,17 @@ def invariable_debut(nom_routeur, txt_routeur):
     txt_routeur += "version 15.2\nservice timestamps debug datetime msec\nservice timestamps log datetime msec\n!\n"
     txt_routeur += "hostname R" + nom_routeur + "\n!\n"
     txt_routeur += "boot-start-marker\nboot-end-marker\n" + point_excl(3)
-    txt_routeur += "no aaa new-model\nno ip icmp rate-limit unreachable\nip cef\n" + point_excl(6)
-    txt_routeur += "no ip domain lookup\nipv6 unicast-routing\nipv6 cef\n" + point_excl(2)
-    txt_routeur += "multilink bundle-name authenticated\n" + point_excl(9)
+    txt_routeur += "no aaa new-model\nno ip icmp rate-limit unreachable\nip cef\n" + point_excl(1)
+    return txt_routeur
+
+
+def invariable2():
+    txt_routeur = point_excl(5)
+    txt_routeur += "no ip domain lookup\nno ipv6 cef\n" + point_excl(2)
+    return txt_routeur
+
+def invariable3():
+    txt_routeur = "multilink bundle-name authenticated\n" + point_excl(9)
     txt_routeur += "ip tcp synwait-time 5\n" + point_excl(12)
 
     return txt_routeur
@@ -300,7 +314,7 @@ def ospf(nom_routeur):
     """Renvoie la configuration du protocole OSPF"""
     # nom_routeur type X.X.X.X avec X le nom du routeur
     adresse = ((nom_routeur + ".")*4)[:-1]
-    txt_routeur = "ipv6 router ospf 31\n"
+    txt_routeur = "ipv6 router ospf 1\n"
     txt_routeur += " router-id "+ adresse + "\n"
     return txt_routeur
 
@@ -385,6 +399,8 @@ def bgp(nom_routeur, voisins, routeur_dans_as, nom_as, routeur_bordure):
     txt_routeur += " exit-address-family\n!\n"    
     return txt_routeur
 
+def mpls():
+    return "mpls label protocol ldp\n"
 
 ############### Drag and drop ################
 def lister_configs_dossier(chemin_dossier):
@@ -433,6 +449,7 @@ def main():
     fjson, chemin_projet = sys.argv[1], sys.argv[2]
 
     dico_json = charger_json(fjson)
+    dico_nom_id = definir_nom_id(dico_json)
     dico_liens = definir_liens_routeurs(dico_json)
     dic_rout_as = dic_routeurs_par_as(dico_json)
     routeurs_bordure = liste_routeurs_bordure(dico_json)
@@ -447,8 +464,9 @@ def main():
     # Pour chaque routeur, on écrit un fichier de configuration
     for nom_as, liste_rout in dic_rout_as.items():
         for r in liste_rout:
-            txt_routeur = invariable_debut(r, "")
             txt_ospf = ""
+            txt_mpls = ""
+            txt_vrf = ""
             bool_bordure = r in routeurs_bordure
 
             # Ajout des interfaces et protocoles
@@ -456,6 +474,12 @@ def main():
                 txt_routeur += interface(i["interface"], i["adresse_interface"], i["protocole_routage"], i["masque"])
                 if "OSPF" in i["protocole_routage"] and "eBGP" not in i["protocole_routage"]:
                     txt_ospf = ospf(r)
+                if "MPLS" in i["protocole_routage"]:
+                    txt_mpls = mpls()
+                # Voir comment on définit le VRF dans 
+
+            txt_routeur = invariable_debut(dico_nom_id[r], "")
+            txt_routeur += txt_vrf
 
             # Config bgp
             txt_routeur += bgp(r, dico_liens, dic_rout_as, nom_as, bool_bordure)
