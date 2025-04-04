@@ -28,7 +28,8 @@ def definir_liens_routeurs(donnees_reseau):
 
         # Parcours des routeurs dans l'AS
         for routeur in as_data["routeur"]:
-            routeur_num = routeur["nom"]
+            routeur_num = routeur["id_routeur"]
+            nom_routeur = routeur["nom"]
             adresse_as = as_data["prefixe_reseau"]
             protocoles = as_data["protocole_routage"]
             masque = as_data["masque_reseau"]
@@ -116,14 +117,15 @@ def definir_liens_routeurs(donnees_reseau):
     for inter_as in donnees_reseau["interAS"]:
         prefixe_reseau = inter_as["prefixe_reseau"]
         for routeur in inter_as["routeur"]:
-            routeur_num = routeur["nom"]
+            routeur_num = routeur["id_routeur"]
+            nom_routeur = routeur["nom"]
             protocoles = []  # Initialisation de la liste des protocoles à vide
             adresse_as = f"{prefixe_reseau}.{compteur_lien}.1"
 
             # Recherche du protocole de l'AS auquel appartient le routeur -> pourrait se simplifier avec dictionnaire routeurs
             for a in donnees_reseau["AS"]:
                 for r in a["routeur"]:
-                    if r["nom"] == routeur_num:
+                    if r["id_routeur"] == routeur_num:
                         protocoles.extend([elt for elt in a["protocole_routage"] if elt == "OSPF"])
 
             # Initialise le routeur si il n'est associé à aucune interface
@@ -136,7 +138,7 @@ def definir_liens_routeurs(donnees_reseau):
                     interface_voisin = None
                     for voisin_routeur in donnees_reseau["AS"] + donnees_reseau["interAS"]:
                         for r in voisin_routeur["routeur"]:
-                            if r["nom"] == voisin:
+                            if r["id_routeur"] == voisin:
                                 for iface, voisin_nom in r["connecte"].items():
                                     if voisin_nom == routeur_num:
                                         interface_voisin = iface
@@ -249,7 +251,7 @@ def dic_routeurs_par_as(data):
     for a in data["AS"]:
         liste_routeurs = []
         for r in a["routeur"]:
-            liste_routeurs.append(r["nom"])
+            liste_routeurs.append(r["id_routeur"])
         dic[a["id_AS"]] = liste_routeurs
     return dic
 
@@ -258,7 +260,7 @@ def liste_routeurs_bordure(data):
     liste = []
     for a in data["interAS"]:
         for r in a["routeur"]:
-            liste.append(r["nom"])
+            liste.append(r["id_routeur"])
     return liste
 
 def interface(nom_interface, ip, protocole, masque):
