@@ -99,7 +99,7 @@
                         "GigabitEthernet2/0":"",
                         "GigabitEthernet3/0":""
                     }
-                },
+                }
             ]
         },
         {
@@ -116,7 +116,7 @@
                         "GigabitEthernet1/0":"",
                         "GigabitEthernet2/0":""
                     }
-                },
+                }
             ]
         }
     ],
@@ -130,13 +130,15 @@
                     "nom": "5",
                     "connecte":{
                         "GigabitEthernet1/0":"1"
-                    }
+                    },
+                    "VRF":[]
                 },
                 {
                     "nom": "7",
                     "connecte":{
                         "GigabitEthernet1/0":"1"
-                    }
+                    },
+                    "VRF":[]
                 },
                 {
                     "nom": "1",
@@ -163,13 +165,15 @@
                     "nom": "6",
                     "connecte":{
                         "GigabitEthernet1/0":"4"
-                    }
+                    },
+                    "VRF":[]
                 },
                 {
                     "nom": "8",
                     "connecte":{
                         "GigabitEthernet1/0":"4"
-                    }
+                    },
+                    "VRF":[]
                 },
                 {
                     "nom": "4",
@@ -189,7 +193,7 @@
                             "interface":"GigabitEthernet3",
                             "RT": "2",
                             "RD": "4"
-                        },
+                        }
                     ]
                 }
             ]
