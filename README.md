@@ -3,13 +3,12 @@
 ## TO-DO
 - Ajouter fonctionnalité
     - Revoir adressage ipv4 Loopback/classique
-    - mpls ip dans les interfaces
     - Interface vrf$
     - eBGP que sur les Loopback des ASBR
+    - modifier iBGP
+    - mpls ip dans les interfaces
     - address-family vpn
-    - address-family ipv4/vrf
-    - remplacer ligne ipv6 avec ipv4
-    - Changer adresse Loopback (192.168.0.X)
+    - address-family ipv4/vrf ==> checj avec : PE/CE = si y'a du eBGP, sinon c'est des P, et pour différencier PE et CE : PE a des vrfet pas CE
  
 
 

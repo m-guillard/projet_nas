@@ -32,13 +32,14 @@ def definir_liens_routeurs(donnees_reseau):
             adresse_as = as_data["prefixe_reseau"]
             protocoles = as_data["protocole_routage"]
             masque = as_data["masque_reseau"]
+            masque_loopback = "255.255.255.255" # toutes les adresses loopback sont en /32
 
             # Si le routeur n'a aucun voisin, on l'initialise
             if routeur_num not in liens:
                 liens[routeur_num] = []
 
             # Ajouter une adresse loopback pour le routeur
-            adresse_loopback = f"{routeur_num}.{routeur_num}.{routeur_num}.{routeur_num}"
+            adresse_loopback = f"{adresse_as}.0.{routeur_num}"
             liens[routeur_num].append({
                 "nom_voisin": routeur_num,
                 "interface": "Loopback0",
@@ -46,7 +47,7 @@ def definir_liens_routeurs(donnees_reseau):
                 "AS": id_as,
                 "adresse_AS": adresse_as,
                 "protocole_routage": protocoles,
-                "masque": "255.255.255.255" # toutes les adresses loopback sont en /32
+                "masque": masque_loopback #255.255.255.255
             })
 
             # On regarde pour tous les routeurs de l'AS
