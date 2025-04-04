@@ -110,6 +110,71 @@ def definir_liens_routeurs(donnees_reseau):
                         "adresse_AS": adresse_as,
                         "protocole_routage": []
                         })
+    
+    # Traitement des connexions inter-AS
+    compteur_lien = 1
+    for inter_as in donnees_reseau["interAS"]:
+        prefixe_reseau = inter_as["prefixe_reseau"]
+        for routeur in inter_as["routeur"]:
+            routeur_num = routeur["nom"]
+            protocoles = []  # Initialisation de la liste des protocoles à vide
+            adresse_as = f"{prefixe_reseau}.{compteur_lien}.1"
+
+            # Recherche du protocole de l'AS auquel appartient le routeur -> pourrait se simplifier avec dictionnaire routeurs
+            for a in donnees_reseau["AS"]:
+                for r in a["routeur"]:
+                    if r["nom"] == routeur_num:
+                        protocoles.extend([elt for elt in a["protocole_routage"] if elt == "OSPF"])
+
+            # Initialise le routeur si il n'est associé à aucune interface
+            if routeur_num not in liens:
+                liens[routeur_num] = []
+
+            for interface, voisin in routeur["connecte"].items():
+                if voisin:  # Si une connexion existe sur cette interface (toujours le cas en inter-as)
+                    # Trouver l'interface du voisin correspondant
+                    interface_voisin = None
+                    for voisin_routeur in donnees_reseau["AS"] + donnees_reseau["interAS"]:
+                        for r in voisin_routeur["routeur"]:
+                            if r["nom"] == voisin:
+                                for iface, voisin_nom in r["connecte"].items():
+                                    if voisin_nom == routeur_num:
+                                        interface_voisin = iface
+                                        break
+                    lien_existe = any(
+                        lien for lien in liens.get(voisin, []) if lien["nom_voisin"] == routeur_num
+                    )
+                    if not lien_existe: # Si le voisin n'a pas été défini
+                        adresse_lien_source = f"{prefixe_reseau}.{compteur_lien}.1"
+                        adresse_lien_dest = f"{prefixe_reseau}.{compteur_lien}.2"
+                        compteur_lien += 1
+
+                        # Ajouter la nouvelle connexion de routeur_num aux précédentes
+                        liens[routeur_num].append({
+                            "nom_voisin": voisin,
+                            "interface": interface,
+                            "adresse_interface": adresse_lien_source,
+                            "AS": "Inter-AS",
+                            "adresse_AS": adresse_as,
+                            "protocole_routage": inter_as['protocole_routage'],  # Ajout correct des protocoles
+                        })
+
+                        # Ajouter le lien pour le routeur voisin
+                        if voisin not in liens:
+                            liens[voisin] = []
+                        liens[voisin].append({
+                            "nom_voisin": routeur_num,
+                            "interface": interface_voisin,
+                            "adresse_interface": adresse_lien_dest,
+                            "AS": "Inter-AS",
+                            "adresse_AS": adresse_as,
+                            "protocole_routage": inter_as['protocole_routage'],
+                        })
+                    else:
+                        # On met à jour les protocoles correctement dans chaque lien existant
+                        for lien in liens[routeur_num]:
+                            if lien["nom_voisin"] == voisin:
+                                lien["protocole_routage"].extend(protocoles)
 
     afficher_dico(liens, "Liens et adresses IP des routeurs :")
     return liens
