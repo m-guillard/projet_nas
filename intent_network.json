@@ -4,7 +4,7 @@
             "id_AS":"1",
             "prefixe_reseau": "192.168.",
             "masque_reseau": "255.255.255.248",
-            "protocole_routage":["OSPF","iBGP"],
+            "protocole_routage":["OSPF","iBGP", "MPLS"],
             "routeur" : [
                 {
                     "nom": "PE1",
@@ -143,7 +143,21 @@
                     "connecte":{
                         "GigabitEthernet2/0":"5",
                         "GigabitEthernet3/0":"7"
-                    }
+                    },
+                    "VRF":[
+                        {
+                            "nom": "VRF1",
+                            "interface":"GigabitEthernet2",
+                            "RT": "1",
+                            "RD": "1"
+                        },
+                        {
+                            "nom": "VRF2",
+                            "interface":"GigabitEthernet3",
+                            "RT": "2",
+                            "RD": "3"
+                        },
+                    ]
                 },
                 {
                     "nom": "6",
@@ -162,7 +176,21 @@
                     "connecte":{
                         "GigabitEthernet2/0":"6",
                         "GigabitEthernet3/0":"8"
-                    }
+                    },
+                    "VRF":[
+                        {
+                            "nom": "VRF1",
+                            "interface":"GigabitEthernet2",
+                            "RT": "1",
+                            "RD": "2"
+                        },
+                        {
+                            "nom": "VRF2",
+                            "interface":"GigabitEthernet3",
+                            "RT": "2",
+                            "RD": "4"
+                        },
+                    ]
                 }
             ]
         }
