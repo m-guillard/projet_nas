@@ -111,6 +111,19 @@ Raccourcis :
 - interface : int
 - no shutdown : no sh
 
+--------------------------------------------------------------------Bonus----------------------------------------------------------------------
+
+Route reflector:
+
+Router(config)# router bgp 1
+Router(config-router)#  bgp router-id 7.7.7.7
+Router(config-router)#  neighbor 1.1.1.1 remote-as 1
+Router(config-router)#  neighbor 1.1.1.1 update-source Loopback0
+Router(config-router-af)#  address-family vpnv4
+Router(config-router-af)#   neighbor 1.1.1.1 activate
+Router(config-router-af)#   neighbor 1.1.1.1 send-community both
+Router(config-router-af)#   neighbor 1.1.1.1 route-reflector-client
+
 
 -------------------------------------------------------------------- NOTES --------------------------------------------------------------------
 Loopback :
