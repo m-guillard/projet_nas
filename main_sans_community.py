@@ -366,21 +366,20 @@ def bgp(nom_routeur, voisins, routeur_dans_as, nom_as, routeur_bordure):
     adresses_ebgp = []
 
     # eBGP
+    # eBGP que si non VRF
     for v in voisins[nom_routeur]:
         if v["AS"] == "Inter-AS":
             routeur_voisin = v["nom_voisin"]
             a_ebgp = [dic["adresse_interface"] for dic in voisins[routeur_voisin] if dic["nom_voisin"]==nom_routeur][0]
-            adresses_ebgp.append(a_ebgp) # On conserve avec le /64
-            a_ebgp = a_ebgp.split("/")[0] # Enlève le /64
+            adresses_ebgp.append(a_ebgp)
             adresses_bgp.append(a_ebgp)
             id_as = [k for k,valeur in routeur_dans_as.items() if v["nom_voisin"] in valeur][0]
             txt_routeur += " neighbor " + a_ebgp + " remote-as " + id_as + "\n"
     # iBGP
     for r in routeur_dans_as[nom_as]:
-        if r != nom_routeur: # Evite d'intégrer l'adresse loopback du routeur qu'on configure
+        if r != nom_routeur and r in liste_routeurs_bordure: # Configurer les routeurs de bordure de loopback
             # Récupère l'adresse de loopback qui est dans le dictionnaire voisins, lorsque l'interface est Loopback0
             a_loopback = [elt["adresse_interface"] for elt in voisins[r] if elt["interface"] == "Loopback0"][0]
-            a_loopback = a_loopback.split("/")[0] # Enlève le /64
             adresses_bgp.append(a_loopback)
             txt_routeur += " neighbor " + a_loopback + " remote-as " + nom_as + "\n"
             txt_routeur += " neighbor " + a_loopback + " update-source Loopback0\n"
@@ -396,11 +395,6 @@ def bgp(nom_routeur, voisins, routeur_dans_as, nom_as, routeur_bordure):
                 liste_reseau_voisin.append(adresse_r)
                 if (not(routeur_bordure) and r==nom_routeur and v["interface"]=="Loopback0") or routeur_bordure:
                     txt_routeur += "  network " + adresse_r + "\n"
-
-    for a in adresses_ebgp:
-        adresse_r = a.split("::")[0] + "::/" + a.split("/")[-1] # Adresse réseau du loopback du routeur
-        txt_routeur += "  network " + adresse_r + "\n"
-
 
     for a in adresses_bgp:
         txt_routeur += "  neighbor " + a + " activate\n"
