@@ -127,21 +127,24 @@
             "protocole_routage":["eBGP"],
             "routeur":[
                 {
-                    "nom": "5",
+                    "nom": "CE1",
+                    "id_routeur": "5",
                     "connecte":{
                         "GigabitEthernet1/0":"1"
                     },
                     "VRF":[]
                 },
                 {
-                    "nom": "7",
+                    "nom": "CE3",
+                    "id_routeur": "7",
                     "connecte":{
                         "GigabitEthernet1/0":"1"
                     },
                     "VRF":[]
                 },
                 {
-                    "nom": "1",
+                    "nom": "PE1",
+                    "id_routeur": "1",
                     "connecte":{
                         "GigabitEthernet2/0":"5",
                         "GigabitEthernet3/0":"7"
@@ -162,21 +165,24 @@
                     ]
                 },
                 {
-                    "nom": "6",
+                    "nom": "CE2",
+                    "id_routeur": "6",
                     "connecte":{
                         "GigabitEthernet1/0":"4"
                     },
                     "VRF":[]
                 },
                 {
-                    "nom": "8",
+                    "nom": "CE4",
+                    "id_routeur": "8",
                     "connecte":{
                         "GigabitEthernet1/0":"4"
                     },
                     "VRF":[]
                 },
                 {
-                    "nom": "4",
+                    "nom": "PE2",
+                    "id_routeur": "4",
                     "connecte":{
                         "GigabitEthernet2/0":"6",
                         "GigabitEthernet3/0":"8"
@@ -199,6 +205,4 @@
             ]
         }
     ]
-
-        
 }
