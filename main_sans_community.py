@@ -81,6 +81,7 @@ def definir_liens_routeurs(donnees_reseau):
                             "nom_voisin": voisin,
                             "interface": interface,
                             "adresse_interface": adresse_lien_source,
+                            "VRF": False,
                             "AS": id_as,
                             "adresse_AS": adresse_as,
                             "protocole_routage": protocoles,
@@ -94,6 +95,7 @@ def definir_liens_routeurs(donnees_reseau):
                             "nom_voisin": routeur_num,
                             "interface": interface_voisin,
                             "adresse_interface": adresse_lien_dest,
+                            "VRF": False,
                             "AS": id_as,
                             "adresse_AS": adresse_as,
                             "protocole_routage": protocoles,
@@ -107,15 +109,18 @@ def definir_liens_routeurs(donnees_reseau):
                         "nom_voisin": "",
                         "interface": interface,
                         "adresse_interface": "",
+                        "VRF": False,
                         "AS": id_as,
                         "adresse_AS": adresse_as,
-                        "protocole_routage": []
+                        "protocole_routage": [],
+                        "masque": masque
                         })
     
     # Traitement des connexions inter-AS
     compteur_lien = 1
     for inter_as in donnees_reseau["interAS"]:
         prefixe_reseau = inter_as["prefixe_reseau"]
+        masque = inter_as["masque_reseau"]
         for routeur in inter_as["routeur"]:
             routeur_num = routeur["id_routeur"]
             protocoles = []  # Initialisation de la liste des protocoles à vide
@@ -131,7 +136,10 @@ def definir_liens_routeurs(donnees_reseau):
             if routeur_num not in liens:
                 liens[routeur_num] = []
 
+            liste_VRF = routeur["VRF"]
             for interface, voisin in routeur["connecte"].items():
+                
+                    
                 if voisin:  # Si une connexion existe sur cette interface (toujours le cas en inter-as)
                     # Trouver l'interface du voisin correspondant
                     interface_voisin = None
@@ -150,26 +158,40 @@ def definir_liens_routeurs(donnees_reseau):
                         adresse_lien_dest = f"{prefixe_reseau}.{compteur_lien}.2"
                         compteur_lien += 1
 
+                        if liste_VRF == [] or [n for n in routeur["VRF"] if routeur["VRF"]["interface"] == interface] == []:
+                            vrf = False
+                        else:
+                            vrf = True
+
                         # Ajouter la nouvelle connexion de routeur_num aux précédentes
                         liens[routeur_num].append({
                             "nom_voisin": voisin,
                             "interface": interface,
                             "adresse_interface": adresse_lien_source,
                             "AS": "Inter-AS",
+                            "VRF": vrf,
                             "adresse_AS": adresse_as,
-                            "protocole_routage": inter_as['protocole_routage'],  # Ajout correct des protocoles
+                            "protocole_routage": inter_as['protocole_routage'],  # Ajout correct des protocoles,
+                            "masque": masque
                         })
 
                         # Ajouter le lien pour le routeur voisin
                         if voisin not in liens:
                             liens[voisin] = []
+
+                        if liste_VRF == [] or [n for n in routeur["VRF"] if routeur["VRF"]["interface"] == interface_voisin] == []:
+                            vrf = False
+                        else:
+                            vrf = True
                         liens[voisin].append({
                             "nom_voisin": routeur_num,
                             "interface": interface_voisin,
                             "adresse_interface": adresse_lien_dest,
+                            "VRF": vrf,
                             "AS": "Inter-AS",
                             "adresse_AS": adresse_as,
                             "protocole_routage": inter_as['protocole_routage'],
+                            "masque": masque
                         })
                     else:
                         # On met à jour les protocoles correctement dans chaque lien existant
@@ -183,7 +205,7 @@ def definir_liens_routeurs(donnees_reseau):
 def definir_nom_id(dico):
     dico_nom = {}
     for a in dico["AS"]:
-        for r in a:
+        for r in a["routeur"]:
             dico_nom[r["id_routeur"]] = r["nom"]
 
     return dico_nom
@@ -312,7 +334,7 @@ def interface(nom_interface, ip, protocole, masque):
         if "OSPF" in protocole and "eBGP" not in protocole:
             txt_routeur += " ip ospf 1 area 0\n"
 
-        if "VRF"
+        #if "VRF"
 
     txt_routeur += "!\n"
 
@@ -325,8 +347,7 @@ def ospf(nom_routeur):
     """Renvoie la configuration du protocole OSPF"""
     # nom_routeur type X.X.X.X avec X le nom du routeur
     adresse = ((nom_routeur + ".")*4)[:-1]
-    txt_routeur = "ipv6 router ospf 1\n"
-    txt_routeur += " router-id "+ adresse + "\n"
+    txt_routeur = " router-id "+ adresse + "\n"
     return txt_routeur
 
 def ecrire_config(txt_routeur, nom_routeur, dossier_config="Config"):
@@ -345,7 +366,7 @@ def ecrire_config(txt_routeur, nom_routeur, dossier_config="Config"):
         f.write(txt_routeur)
 
 
-def bgp(nom_routeur, voisins, routeur_dans_as, nom_as, routeur_bordure):
+def bgp(nom_routeur, voisins, routeur_dans_as, nom_as, routeur_bordure, dico_nom_id, infos_vrf):
     """
     Implémente bgp dans la configuration du routeur
     Paramètres :
@@ -354,6 +375,7 @@ def bgp(nom_routeur, voisins, routeur_dans_as, nom_as, routeur_bordure):
     - routeur_dans_as(dict) : donne tous les routeurs de l'AS
     - nom_as(str) : nom de l'AS
     - routeur_bordure (bool) : True si routeur de bordure, False sinon
+    - infos_vrf(list): None si pas VRF, listes des infos VRF sinon
     Return : Ne retourne rien
     """
     txt_routeur = "router bgp " + nom_as + "\n"
@@ -365,26 +387,53 @@ def bgp(nom_routeur, voisins, routeur_dans_as, nom_as, routeur_bordure):
     adresses_bgp = []
     adresses_ebgp = []
 
-    # eBGP
-    # eBGP que si non VRF
-    for v in voisins[nom_routeur]:
-        if v["AS"] == "Inter-AS":
-            routeur_voisin = v["nom_voisin"]
-            a_ebgp = [dic["adresse_interface"] for dic in voisins[routeur_voisin] if dic["nom_voisin"]==nom_routeur][0]
-            adresses_ebgp.append(a_ebgp)
-            adresses_bgp.append(a_ebgp)
-            id_as = [k for k,valeur in routeur_dans_as.items() if v["nom_voisin"] in valeur][0]
-            txt_routeur += " neighbor " + a_ebgp + " remote-as " + id_as + "\n"
-    # iBGP
-    for r in routeur_dans_as[nom_as]:
-        if r != nom_routeur and r in liste_routeurs_bordure: # Configurer les routeurs de bordure de loopback
-            # Récupère l'adresse de loopback qui est dans le dictionnaire voisins, lorsque l'interface est Loopback0
-            a_loopback = [elt["adresse_interface"] for elt in voisins[r] if elt["interface"] == "Loopback0"][0]
-            adresses_bgp.append(a_loopback)
-            txt_routeur += " neighbor " + a_loopback + " remote-as " + nom_as + "\n"
-            txt_routeur += " neighbor " + a_loopback + " update-source Loopback0\n"
+    voisin_vr = [v for v in voisins[nom_routeur] if  dico_nom_id[voisins[nom_routeur]]=="RR"]
 
-    txt_routeur += " !\n address-family ipv4\n exit-address-family\n !\n address-family ipv6\n"
+    # On regarde si voisin RR
+    if voisin_vr != []:
+        a_rr = [v for v["adresse_interface"] in voisin_vr if voisin_vr["interface"] == "Loopback0"][0]
+        adresses_bgp.append(a_rr)
+        txt_routeur += " neighbor " + a_rr + " remote-as " + nom_as
+        txt_routeur += " neighbor " + a_rr + " update-source Loopback0\n"
+    # On regarde si routeur est RR
+    elif dico_nom_id[nom_routeur] == "RR":
+        for v in voisins[nom_routeur]:
+            a_rr = [v for v["adresse_interface"] in voisin_vr if voisin_vr["interface"] == "Loopback0"][0]
+            adresses_bgp.append(a_rr)
+            txt_routeur += " neighbor " + a_rr + " remote-as " + nom_as + "\n"
+            txt_routeur += " neighbor " + a_rr + " update-source Loopback0\n"
+
+    else:
+        for v in voisins[nom_routeur]:
+            if v["AS"] == "Inter-AS":
+                routeur_voisin = v["nom_voisin"]
+                a_ebgp = [dic["adresse_interface"] for dic in voisins[routeur_voisin] if dic["nom_voisin"]==nom_routeur][0]
+                adresses_ebgp.append(a_ebgp)
+                adresses_bgp.append(a_ebgp)
+                id_as = [k for k,valeur in routeur_dans_as.items() if v["nom_voisin"] in valeur][0]
+                txt_routeur += " neighbor " + a_ebgp + " remote-as " + id_as + "\n"
+
+    if dico_nom_id[nom_routeur] != "RR" and infos_vrf==None:
+        txt_routeur += " !\n address-family ipv4\n redistribute connected\n"
+        for a in adresses_bgp:
+            txt_routeur += "  neighbor " + a + " activate\n"
+            txt_routeur += "  neighbor " + a + " send-community both\n"
+    else:
+        txt_routeur += " !\n address-family vpnv4\n"
+        for a in adresses_bgp:
+            txt_routeur += "  neighbor " + a + " activate\n"
+            txt_routeur += "  neighbor " + a + " send-community both\n"
+            if dico_nom_id[nom_routeur] == "RR":
+                txt_routeur += "  neighbor " + a + " route-reflector-client\n"
+    txt_routeur += " exit-address-family\n"
+    
+    if infos_vrf != None:
+        for v in infos_vrf:
+            txt_routeur += " !\n address-family ipv4 vrf "+ v["nom"] + "\n"
+            txt_routeur += " neighbor " + v["adresse_voisin"] + " remote-as " + v["nom_as_voisin"] + "\n"
+            txt_routeur += " neighbor " + v["adresse_voisin"] + " update-source Loopback0\n"
+            txt_routeur += " exit-address-family"
+
 
     liste_reseau_voisin = []
     for r in routeur_dans_as[nom_as]:
@@ -396,11 +445,6 @@ def bgp(nom_routeur, voisins, routeur_dans_as, nom_as, routeur_bordure):
                 if (not(routeur_bordure) and r==nom_routeur and v["interface"]=="Loopback0") or routeur_bordure:
                     txt_routeur += "  network " + adresse_r + "\n"
 
-    for a in adresses_bgp:
-        txt_routeur += "  neighbor " + a + " activate\n"
-
-
-    txt_routeur += " exit-address-family\n!\n"    
     return txt_routeur
 
 def mpls():
@@ -469,6 +513,7 @@ def main():
     # Pour chaque routeur, on écrit un fichier de configuration
     for nom_as, liste_rout in dic_rout_as.items():
         for r in liste_rout:
+            txt_routeur = ""
             txt_ospf = ""
             txt_mpls = ""
             txt_vrf = ""
@@ -490,7 +535,8 @@ def main():
             txt_routeur += invariable3()
 
             # Config bgp
-            txt_routeur += bgp(r, dico_liens, dic_rout_as, nom_as, bool_bordure)
+            infos_vrf = vrf.get(r)
+            txt_routeur += bgp(r, dico_liens, dic_rout_as, nom_as, bool_bordure, dico_nom_id, infos_vrf)
 
             # Ajout sections communes
             txt_routeur += invariable_milieu()
