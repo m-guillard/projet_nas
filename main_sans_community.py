@@ -198,7 +198,7 @@ def charger_json(nom_fichier):
         data_loaded = json.load(file)
     return data_loaded
 
-def invariable_debut(nom_routeur, txt_routeur):
+def invariable_debut(nom_routeur, txt_routeur, texte_decla_vrf):
     """
     Renvoie la configuration du routeur au début du fichier qui est identique pour tous les routeurs
     Paramètres :
@@ -214,7 +214,7 @@ def invariable_debut(nom_routeur, txt_routeur):
     txt_routeur += "hostname R" + nom_routeur + "\n!\n"
     txt_routeur += "boot-start-marker\nboot-end-marker\n" + point_excl(3)
     txt_routeur += "no aaa new-model\nno ip icmp rate-limit unreachable\nip cef\n" + point_excl(1)
-    txt_routeur += decla_vrf
+    txt_routeur += texte_decla_vrf
 
     # ici condition si routeur est vrf, donc import du dico des vrf
     return txt_routeur
@@ -282,23 +282,46 @@ def liste_routeurs_bordure(data):
     return liste
 
 
-def dic_vrf(inter_as_list):
-    """Renvoie un dictionnaire des routeurs avec leurs VRF"""
+def dic_vrf(inter_as_list, dico_liens):
+    """Renvoie un dictionnaire des routeurs avec leurs VRF enrichies avec les infos du voisin"""
     vrf_routeurs = {}
 
     for inter_as in inter_as_list:
         for routeur in inter_as.get("routeur", []):
             if routeur.get("VRF"):
-                vrf_routeurs[routeur["id_routeur"]] = []
+                id_local = routeur["id_routeur"]
+                vrf_routeurs[id_local] = []
+
                 for vrf in routeur["VRF"]:
-                    vrf_routeurs[routeur["id_routeur"]].append({
-                        "nom": vrf["nom"],
-                        "interface": vrf["interface"],
+                    nom_vrf = vrf["nom"]
+                    interface_base = vrf["interface"]  # Ex: "GigabitEthernet2/0"
+
+                    # Trouver l'ID du voisin sur cette interface
+                    voisin_id = routeur["connecte"].get(interface_base)
+
+                    adresse_voisin = ""
+                    as_voisin = ""
+                    
+                    if voisin_id:
+                        # Parcourir les liaisons du voisin pour trouver l'interface qui connecte ce routeur
+                        for lien in dico_liens.get(voisin_id, []):
+                            if lien["nom_voisin"] == id_local:
+                                adresse_voisin = lien["adresse_interface"]
+                                as_voisin = lien["AS"]
+                                break
+
+                    # Ajouter l'entrée enrichie
+                    vrf_routeurs[id_local].append({
+                        "nom": nom_vrf,
+                        "interface": interface_base,
                         "RD": vrf["RD"],
-                        "RT": vrf["RT"]
+                        "RT": vrf["RT"],
+                        "adresse_voisin": adresse_voisin,
+                        "AS_voisin": as_voisin
                     })
 
     return vrf_routeurs
+
 
 def decla_vrf(nom_vrf, num_AS, num_RT, num_RD):
     txt_routeur = "ip vrf " + nom_vrf + "\n"
@@ -489,7 +512,7 @@ def main():
     dico_liens = definir_liens_routeurs(dico_json)
     dic_rout_as = dic_routeurs_par_as(dico_json)
     routeurs_bordure = liste_routeurs_bordure(dico_json)
-    dico_vrf = dic_vrf(dico_json["interAS"])
+    dico_vrf = dic_vrf(dico_json["interAS"], dico_liens)
 
     chemin_config = "Config"  # Dossier où se trouvent les fichiers de configuration générés
 
@@ -517,7 +540,14 @@ def main():
                 # Voir comment on définit le VRF dans 
 
 
-            txt_routeur = invariable_debut(dico_nom_id[r], "")
+            for vrf_data in dico_vrf.get(r, []):
+                nom_vrf = vrf_data["nom"]
+                num_AS = nom_as
+                num_RT = vrf_data["RT"]
+                num_RD = vrf_data["RD"] 
+                txt_vrf += decla_vrf(nom_vrf, num_AS, num_RT, num_RD)
+
+            txt_routeur = invariable_debut(dico_nom_id[r], "", txt_vrf)
             txt_routeur += txt_vrf
             txt_routeur += invariable2()
             txt_routeur += txt_mpls

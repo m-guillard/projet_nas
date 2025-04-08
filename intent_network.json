@@ -152,13 +152,13 @@
                     "VRF":[
                         {
                             "nom": "VRF1",
-                            "interface":"GigabitEthernet2",
+                            "interface":"GigabitEthernet2/0",
                             "RT": "1",
                             "RD": "1"
                         },
                         {
                             "nom": "VRF2",
-                            "interface":"GigabitEthernet3",
+                            "interface":"GigabitEthernet3/0",
                             "RT": "2",
                             "RD": "3"
                         }
@@ -190,13 +190,13 @@
                     "VRF":[
                         {
                             "nom": "VRF1",
-                            "interface":"GigabitEthernet2",
+                            "interface":"GigabitEthernet2/0",
                             "RT": "1",
                             "RD": "2"
                         },
                         {
                             "nom": "VRF2",
-                            "interface":"GigabitEthernet3",
+                            "interface":"GigabitEthernet3/0",
                             "RT": "2",
                             "RD": "4"
                         }
