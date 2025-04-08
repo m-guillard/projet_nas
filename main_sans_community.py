@@ -220,7 +220,7 @@ def charger_json(nom_fichier):
         data_loaded = json.load(file)
     return data_loaded
 
-def invariable_debut(nom_routeur, txt_routeur):
+def invariable_debut(nom_routeur, txt_routeur, fonction_decla_vrf):
     """
     Renvoie la configuration du routeur au début du fichier qui est identique pour tous les routeurs
     Paramètres :
@@ -236,7 +236,7 @@ def invariable_debut(nom_routeur, txt_routeur):
     txt_routeur += "hostname R" + nom_routeur + "\n!\n"
     txt_routeur += "boot-start-marker\nboot-end-marker\n" + point_excl(3)
     txt_routeur += "no aaa new-model\nno ip icmp rate-limit unreachable\nip cef\n" + point_excl(1)
-    txt_routeur += decla_vrf
+    txt_routeur += fonction_decla_vrf
 
     # ici condition si routeur est vrf, donc import du dico des vrf
     return txt_routeur
@@ -419,7 +419,7 @@ def bgp(nom_routeur, voisins, routeur_dans_as, nom_as, routeur_bordure, dico_nom
     adresses_bgp = []
     adresses_ebgp = []
 
-    voisin_vr = [v for v in voisins[nom_routeur] if  dico_nom_id[voisins[nom_routeur]]=="RR"]
+    voisin_vr = [v for v in voisins[nom_routeur] if  v["nom_voisin"] != "" and dico_nom_id[v["nom_voisin"]]=="RR"]
 
     # On regarde si voisin RR
     if voisin_vr != []:
@@ -525,8 +525,9 @@ def main():
     # Récupère le nom des fichiers à partir de l'invite de commande
     if len(sys.argv) != 3:
         print("Arguments : <INTENT_FILE.json> <DOSSIER_PROJET_GNS>", file=sys.stderr)
-        sys.exit(1)
-    fjson, chemin_projet = sys.argv[1], sys.argv[2]
+        # sys.exit(1)
+    fjson = "intent_network.json"
+    # fjson, chemin_projet = sys.argv[1], sys.argv[2]
 
     dico_json = charger_json(fjson)
     dico_nom_id = definir_nom_id(dico_json)
@@ -562,14 +563,14 @@ def main():
                 # Voir comment on définit le VRF dans 
 
 
-            txt_routeur = invariable_debut(dico_nom_id[r], "")
+            txt_routeur = invariable_debut(dico_nom_id[r], "", "")
             txt_routeur += txt_vrf
             txt_routeur += invariable2()
             txt_routeur += txt_mpls
             txt_routeur += invariable3()
 
             # Config bgp
-            infos_vrf = vrf.get(r)
+            infos_vrf = dico_vrf.get(r)
             txt_routeur += bgp(r, dico_liens, dic_rout_as, nom_as, bool_bordure, dico_nom_id, infos_vrf)
 
             # Ajout sections communes
@@ -581,9 +582,9 @@ def main():
             ecrire_config(txt_routeur, r)  
 
     # Récupère tous les fichiers de configuration dans le dossier Config
-    fichiers_config = lister_configs_dossier(chemin_config) 
+    # fichiers_config = lister_configs_dossier(chemin_config) 
     # print(fichiers_config)
-
+"""
     # Copie des fichiers de configuration générés
     for chemin_fichier in fichiers_config:
         try:
@@ -594,6 +595,6 @@ def main():
         except Exception as e:
             print(f"Erreur lors de la copie pour le fichier {chemin_fichier}: {e}")
 
-
+"""
 if __name__ == "__main__":
     main()
