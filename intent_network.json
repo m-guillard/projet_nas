@@ -140,6 +140,8 @@
                 {
                     "nom": "CE1",
                     "id_routeur": "5",
+                    "nom": "CE1",
+                    "id_routeur": "5",
                     "connecte":{
                         "GigabitEthernet1/0":"1"
                     },
@@ -216,6 +218,4 @@
             ]
         }
     ]
-
-        
 }

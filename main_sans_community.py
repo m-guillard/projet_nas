@@ -236,6 +236,9 @@ def invariable_debut(nom_routeur, txt_routeur):
     txt_routeur += "hostname R" + nom_routeur + "\n!\n"
     txt_routeur += "boot-start-marker\nboot-end-marker\n" + point_excl(3)
     txt_routeur += "no aaa new-model\nno ip icmp rate-limit unreachable\nip cef\n" + point_excl(1)
+    txt_routeur += decla_vrf
+
+    # ici condition si routeur est vrf, donc import du dico des vrf
     return txt_routeur
 
 
@@ -300,15 +303,35 @@ def liste_routeurs_bordure(data):
             liste.append(r["id_routeur"])
     return liste
 
-def dic_vrf(data):
-    """
-    
-    Paramètre:
-    - data: 
-    """
+
+def dic_vrf(inter_as_list):
+    """Renvoie un dictionnaire des routeurs avec leurs VRF"""
+    vrf_routeurs = {}
+
+    for inter_as in inter_as_list:
+        for routeur in inter_as.get("routeur", []):
+            if routeur.get("VRF"):
+                vrf_routeurs[routeur["id_routeur"]] = []
+                for vrf in routeur["VRF"]:
+                    vrf_routeurs[routeur["id_routeur"]].append({
+                        "nom": vrf["nom"],
+                        "interface": vrf["interface"],
+                        "RD": vrf["RD"],
+                        "RT": vrf["RT"]
+                    })
+
+    return vrf_routeurs
+
+def decla_vrf(nom_vrf, num_AS, num_RT, num_RD):
+    txt_routeur = "ip vrf " + nom_vrf + "\n"
+    txt_routeur += " rd " + num_AS + ":" + num_RD + "\n"
+    txt_routeur += " route-target export " + num_AS + ":" + num_RT + "\n"
+    txt_routeur += " route-target import " + num_AS + ":" + num_RT + "\n!\n"
+    return txt_routeur
 
 
-def interface(nom_interface, ip, protocole, masque):
+
+def interface(nom_interface, ip, protocole, masque, dico_vrf, routeur):
     """
     Renvoie la configuration de l'interface
     Paramètres:
@@ -318,23 +341,32 @@ def interface(nom_interface, ip, protocole, masque):
     Return(str): texte de configuration à jour
     """
     txt_routeur = "interface " + nom_interface + "\n"
-    txt_routeur += " no ip address\n"
-
-    if ip == "" and "FastEthernet" not in nom_interface: # L'interface n'est connectée à aucun routeur
+    
+    if ip == "": # si pas d'IP, on désactive l'interface
+        txt_routeur += " no ip address\n"
         txt_routeur += " shutdown\n"
 
-    if "GigabitEthernet" in nom_interface:
-        txt_routeur += " negotiation auto\n"
-    elif "FastEthernet" in nom_interface:
-        txt_routeur += " duplex full\n"
+        if "GigabitEthernet" in nom_interface:
+            txt_routeur += " negotiation auto\n"
+        elif "FastEthernet" in nom_interface:
+            txt_routeur += " duplex full\n"
 
-    if ip != "": # L'interface est connectée à un routeur
+
+    else: # L'interface est connectée à un routeur
+        for vrf_data in dico_vrf.get(routeur, []):
+            if vrf_data["interface"] == nom_interface:
+                txt_routeur += " ip vrf forwarding " + vrf_data["nom"] + "\n"
+
+
         txt_routeur += " ip address " + ip + " " + masque + "\n"
 
         if "OSPF" in protocole and "eBGP" not in protocole:
             txt_routeur += " ip ospf 1 area 0\n"
+        
+        txt_routeur += " negotiation auto\n"
 
-        #if "VRF"
+        if "MPLS" in protocole and "eBGP" not in protocole:
+            txt_routeur += " mpls ip\n"
 
     txt_routeur += "!\n"
 
@@ -501,7 +533,7 @@ def main():
     dico_liens = definir_liens_routeurs(dico_json)
     dic_rout_as = dic_routeurs_par_as(dico_json)
     routeurs_bordure = liste_routeurs_bordure(dico_json)
-    routeurs_vrf = dic_vrf(dico_json["interAS"])
+    dico_vrf = dic_vrf(dico_json["interAS"])
 
     chemin_config = "Config"  # Dossier où se trouvent les fichiers de configuration générés
 
@@ -521,12 +553,14 @@ def main():
 
             # Ajout des interfaces et protocoles
             for i in dico_liens[r]:
-                txt_routeur += interface(i["interface"], i["adresse_interface"], i["protocole_routage"], i["masque"])
+                txt_routeur += interface(i["interface"], i["adresse_interface"], i["protocole_routage"], i["masque"], dico_vrf, r)
+                #
                 if "OSPF" in i["protocole_routage"] and "eBGP" not in i["protocole_routage"]:
                     txt_ospf = ospf(r)
                 if "MPLS" in i["protocole_routage"]:
                     txt_mpls = mpls()
                 # Voir comment on définit le VRF dans 
+
 
             txt_routeur = invariable_debut(dico_nom_id[r], "")
             txt_routeur += txt_vrf
