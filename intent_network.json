@@ -2,7 +2,7 @@
     "AS": [
         {
             "id_AS":"1",
-            "prefixe_reseau": "192.168.",
+            "prefixe_reseau": "192.168",
             "masque_reseau": "255.255.255.248",
             "protocole_routage":["OSPF","iBGP", "MPLS"],
             "routeur" : [
@@ -45,12 +45,22 @@
                         "GigabitEthernet2/0":"",
                         "GigabitEthernet3/0":""
                     }
-                }  
+                },
+                {
+                    "nom": "RR",
+                    "id_routeur": "9",
+                    "connecte": {
+                        "FastEthernet0/0":"",
+                        "GigabitEthernet1/0": "1",
+                        "GigabitEthernet2/0": "2",
+                        "GigabitEthernet3/0": ""
+                    }
+                }
             ]
         },
         {
             "id_AS":"2",
-            "prefixe_reseau": "192.170.",
+            "prefixe_reseau": "192.170",
             "masque_reseau": "255.255.255.248",
             "protocole_routage":["OSPF","iBGP"],
             "routeur" : [
@@ -68,7 +78,7 @@
         },
         {
             "id_AS":"3",
-            "prefixe_reseau": "192.171.",
+            "prefixe_reseau": "192.171",
             "masque_reseau": "255.255.255.248",
             "protocole_routage":["OSPF","iBGP"],
             "routeur" : [
@@ -86,7 +96,7 @@
         },
         {
             "id_AS":"4",
-            "prefixe_reseau": "192.172.",
+            "prefixe_reseau": "192.172",
             "masque_reseau": "255.255.255.248",
             "protocole_routage":["OSPF","iBGP"],
             "routeur" : [
@@ -104,7 +114,7 @@
         },
         {
             "id_AS":"5",
-            "prefixe_reseau": "192.173.",
+            "prefixe_reseau": "192.173",
             "masque_reseau": "255.255.255.248",
             "protocole_routage":["OSPF","iBGP"],
             "routeur" : [
@@ -123,10 +133,13 @@
 
     "interAS": [
         {
-            "prefixe_reseau":"192.169.",
+            "prefixe_reseau":"192.169",
+            "masque_reseau": "255.255.255.248",
             "protocole_routage":["eBGP"],
             "routeur":[
                 {
+                    "nom": "CE1",
+                    "id_routeur": "5",
                     "nom": "CE1",
                     "id_routeur": "5",
                     "connecte":{
