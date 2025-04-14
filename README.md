@@ -13,6 +13,11 @@
 
     - attention commentaires de la magouille intersidérale
 
+## Erreurs à corriger
+- Vérifier OSPF pas sur toutes les interfaces
+- Nom AS = InterAS dans VRF
+- Corriger fichier d'intention : Voisins sur la mm interface, voisins non déclarés des deux côtés
+
 
 
 ![image](https://github.com/user-attachments/assets/811c3436-3d74-4b45-89ba-5faec7ea9774)

@@ -11,9 +11,7 @@
                     "id_routeur": "1",
                     "connecte": {
                         "FastEthernet0/0":"",
-                        "GigabitEthernet1/0":"2",
-                        "GigabitEthernet2/0":"",
-                        "GigabitEthernet3/0":""
+                        "GigabitEthernet1/0":"2"
                     }
                 },
                 {
@@ -69,7 +67,6 @@
                     "id_routeur": "5",
                     "connecte": {
                         "FastEthernet0/0":"",
-                        "GigabitEthernet1/0":"",
                         "GigabitEthernet2/0":"",
                         "GigabitEthernet3/0":""
                     }
@@ -87,7 +84,6 @@
                     "id_routeur": "6",
                     "connecte": {
                         "FastEthernet0/0":"",
-                        "GigabitEthernet1/0":"",
                         "GigabitEthernet2/0":"",
                         "GigabitEthernet3/0":""
                     }
@@ -105,9 +101,7 @@
                     "id_routeur": "7",
                     "connecte": {
                         "FastEthernet0/0":"",
-                        "GigabitEthernet1/0":"",
-                        "GigabitEthernet2/0":"",
-                        "GigabitEthernet3/0":""
+                        "GigabitEthernet1/0":""
                     }
                 }
             ]
@@ -123,8 +117,8 @@
                     "id_routeur": "8",
                     "connecte": {
                         "FastEthernet0/0":"",
-                        "GigabitEthernet1/0":"",
-                        "GigabitEthernet2/0":""
+                        "GigabitEthernet2/0":"",
+                        "GigabitEthernet3/0":""
                     }
                 }
             ]
@@ -138,8 +132,6 @@
             "protocole_routage":["eBGP"],
             "routeur":[
                 {
-                    "nom": "CE1",
-                    "id_routeur": "5",
                     "nom": "CE1",
                     "id_routeur": "5",
                     "connecte":{
