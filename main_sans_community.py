@@ -199,7 +199,7 @@ def definir_liens_routeurs(donnees_reseau):
                             if lien["nom_voisin"] == voisin:
                                 lien["protocole_routage"].extend(protocoles)
 
-    afficher_dico(liens, "Liens et adresses IP des routeurs :")
+    # afficher_dico(liens, "Liens et adresses IP des routeurs :")
     return liens
 
 def definir_nom_id(dico):
@@ -326,6 +326,7 @@ def dic_vrf(inter_as_list, dico_liens):
                     if voisin_id:
                         # Parcourir les liaisons du voisin pour trouver l'interface qui connecte ce routeur
                         for lien in dico_liens.get(voisin_id, []):
+                            print("Le lien", lien)
                             if lien["nom_voisin"] == id_local:
                                 adresse_voisin = lien["adresse_interface"]
                                 as_voisin = lien["AS"]
@@ -334,6 +335,7 @@ def dic_vrf(inter_as_list, dico_liens):
                     # Ajouter l'entrée enrichie
                     vrf_routeurs[id_local].append({
                         "nom": nom_vrf,
+                        "nom_voisin":voisin_id,
                         "interface": interface_base,
                         "RD": vrf["RD"],
                         "RT": vrf["RT"],
@@ -454,7 +456,6 @@ def bgp(nom_routeur, voisins, routeur_dans_as, nom_as, routeur_bordure, dico_nom
     elif dico_nom_id[nom_routeur] == "RR":
         for v_rr in voisins[nom_routeur]:
             if v_rr["nom_voisin"] != "" and v_rr["nom_voisin"]!=nom_routeur:
-                print(v_rr)
                 a_rr = [v["adresse_interface"] for v in voisins[v_rr["nom_voisin"]] if v["interface"] == "Loopback0"][0]
                 adresses_bgp.append(a_rr)
                 txt_routeur += " neighbor " + a_rr + " remote-as " + nom_as + "\n"
@@ -470,27 +471,31 @@ def bgp(nom_routeur, voisins, routeur_dans_as, nom_as, routeur_bordure, dico_nom
                 id_as = [k for k,valeur in routeur_dans_as.items() if v["nom_voisin"] in valeur][0]
                 txt_routeur += " neighbor " + a_ebgp + " remote-as " + id_as + "\n"
 
-    if dico_nom_id[nom_routeur] != "RR" and infos_vrf==None:
-        txt_routeur += " !\n address-family ipv4\n redistribute connected\n"
+    if dico_nom_id[nom_routeur] != "RR" and infos_vrf is None:
+        txt_routeur += " !\n address-family ipv4\n"
+        if "CE" in dico_nom_id[nom_routeur]:
+            txt_routeur += "  redistribute connected\n"
         for a in adresses_bgp:
             txt_routeur += "  neighbor " + a + " activate\n"
             txt_routeur += "  neighbor " + a + " send-community both\n"
-    elif dico_nom_id[nom_routeur] == "RR":
+        txt_routeur += " exit-address-family\n!\n"
+    if dico_nom_id[nom_routeur] == "RR" or "PE" in dico_nom_id[nom_routeur]:
         txt_routeur += " !\n address-family vpnv4\n"
-        print(adresses_bgp)
         for a in adresses_bgp:
             txt_routeur += "  neighbor " + a + " activate\n"
             txt_routeur += "  neighbor " + a + " send-community both\n"
             if dico_nom_id[nom_routeur] == "RR":
                 txt_routeur += "  neighbor " + a + " route-reflector-client\n"
-    txt_routeur += " exit-address-family\n!\n"
+        txt_routeur += " exit-address-family\n!\n"
     
     if infos_vrf != None:
         for v in infos_vrf:
-            txt_routeur += " address-family ipv4 vrf "+ v["nom"] + "\n"
-            txt_routeur += "  neighbor " + v["adresse_voisin"] + " remote-as " + v["AS_voisin"] + "\n"
-            txt_routeur += "  neighbor " + v["adresse_voisin"] + " activate\n"
-            txt_routeur += " exit-address-family\n!\n"
+            if v["AS_voisin"] == "Inter-AS":
+                id_as = [k for k,valeur in routeur_dans_as.items() if v["nom_voisin"] in valeur][0]
+                txt_routeur += " address-family ipv4 vrf "+ v["nom"] + "\n  redistribute connected\n"
+                txt_routeur += "  neighbor " + v["adresse_voisin"] + " remote-as " + id_as + "\n"
+                txt_routeur += "  neighbor " + v["adresse_voisin"] + " activate\n"
+                txt_routeur += " exit-address-family\n!\n"
 
     return txt_routeur
 
@@ -540,9 +545,9 @@ def main():
     # Récupère le nom des fichiers à partir de l'invite de commande
     if len(sys.argv) != 3:
         print("Arguments : <INTENT_FILE.json> <DOSSIER_PROJET_GNS>", file=sys.stderr)
-        # sys.exit(1)
-    fjson = "intent_network.json"
-    # fjson, chemin_projet = sys.argv[1], sys.argv[2]
+        sys.exit(1)
+    # fjson = "intent_network.json"
+    fjson, chemin_projet = sys.argv[1], sys.argv[2]
 
     dico_json = charger_json(fjson)
     dico_nom_id = definir_nom_id(dico_json)
@@ -550,6 +555,7 @@ def main():
     dic_rout_as = dic_routeurs_par_as(dico_json)
     routeurs_bordure = liste_routeurs_bordure(dico_json)
     dico_vrf = dic_vrf(dico_json["interAS"], dico_liens)
+    print("VRF =", dico_vrf)
 
     chemin_config = "Config"  # Dossier où se trouvent les fichiers de configuration générés
 
@@ -607,9 +613,9 @@ def main():
             ecrire_config(txt_routeur, r)  
 
     # Récupère tous les fichiers de configuration dans le dossier Config
-    # fichiers_config = lister_configs_dossier(chemin_config) 
-    # print(fichiers_config)
-"""
+    fichiers_config = lister_configs_dossier(chemin_config) 
+    print(fichiers_config)
+
     # Copie des fichiers de configuration générés
     for chemin_fichier in fichiers_config:
         try:
@@ -620,6 +626,6 @@ def main():
         except Exception as e:
             print(f"Erreur lors de la copie pour le fichier {chemin_fichier}: {e}")
 
-"""
+
 if __name__ == "__main__":
     main()

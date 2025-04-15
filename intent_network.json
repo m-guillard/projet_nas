@@ -43,8 +43,6 @@
                     "connecte": {
                         "FastEthernet0/0":"",
                         "GigabitEthernet1/0":"3",
-                        "GigabitEthernet2/0":"",
-                        "GigabitEthernet3/0":"",
                         "GigabitEthernet4/0":"9"
                     }
                 },
