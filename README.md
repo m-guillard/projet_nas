@@ -13,10 +13,14 @@
 
     - attention commentaires de la magouille intersidérale
 
-## Erreurs à corriger
-- Vérifier OSPF pas sur toutes les interfaces
-- Nom AS = InterAS dans VRF
-- Vérifier tous les fichiers
+## Pour tester
+- Test effectué avec config_test.zip avec le fichier d'intention intent_network.json
+
+## Erreurs à corriger/Tests effectués
+- Ping impossible de PE à CE mais possible de CE à PE
+- Ping impossible entre deux CE d'un mm client
+- Ping entre les PE et les P
+- Erreurs dans terminal : ligne exit-address-family (je comprends pas d'où ça vient)
 
 
 
