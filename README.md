@@ -16,7 +16,7 @@
 ## Erreurs à corriger
 - Vérifier OSPF pas sur toutes les interfaces
 - Nom AS = InterAS dans VRF
-- Corriger fichier d'intention : Voisins sur la mm interface, voisins non déclarés des deux côtés
+- Vérifier tous les fichiers
 
 
 

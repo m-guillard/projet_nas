@@ -441,21 +441,24 @@ def bgp(nom_routeur, voisins, routeur_dans_as, nom_as, routeur_bordure, dico_nom
     adresses_bgp = []
     adresses_ebgp = []
 
-    voisin_vr = [v for v in voisins[nom_routeur] if  v["nom_voisin"] != "" and dico_nom_id[v["nom_voisin"]]=="RR"]
+    voisin_vr = [v for v in voisins[nom_routeur] if  v["nom_voisin"] != "" and dico_nom_id[v["nom_voisin"]]=="RR" and v["interface"]!="Loopback0"]
 
     # On regarde si voisin RR
     if voisin_vr != []:
-        a_rr = [v["adresse_interface"] for v in voisin_vr if v["interface"] == "Loopback0"][0]
+        a_vrr= voisin_vr[0]
+        a_rr = [v["adresse_interface"] for v in voisins[a_vrr["nom_voisin"]] if v["interface"] == "Loopback0"][0]
         adresses_bgp.append(a_rr)
-        txt_routeur += " neighbor " + a_rr + " remote-as " + nom_as
+        txt_routeur += " neighbor " + a_rr + " remote-as " + nom_as + "\n"
         txt_routeur += " neighbor " + a_rr + " update-source Loopback0\n"
     # On regarde si routeur est RR
     elif dico_nom_id[nom_routeur] == "RR":
-        for v in voisins[nom_routeur]:
-            a_rr = [v for v["adresse_interface"] in voisin_vr if voisin_vr["interface"] == "Loopback0"][0]
-            adresses_bgp.append(a_rr)
-            txt_routeur += " neighbor " + a_rr + " remote-as " + nom_as + "\n"
-            txt_routeur += " neighbor " + a_rr + " update-source Loopback0\n"
+        for v_rr in voisins[nom_routeur]:
+            if v_rr["nom_voisin"] != "" and v_rr["nom_voisin"]!=nom_routeur:
+                print(v_rr)
+                a_rr = [v["adresse_interface"] for v in voisins[v_rr["nom_voisin"]] if v["interface"] == "Loopback0"][0]
+                adresses_bgp.append(a_rr)
+                txt_routeur += " neighbor " + a_rr + " remote-as " + nom_as + "\n"
+                txt_routeur += " neighbor " + a_rr + " update-source Loopback0\n"
 
     else:
         for v in voisins[nom_routeur]:

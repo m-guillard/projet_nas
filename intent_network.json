@@ -11,7 +11,8 @@
                     "id_routeur": "1",
                     "connecte": {
                         "FastEthernet0/0":"",
-                        "GigabitEthernet1/0":"2"
+                        "GigabitEthernet1/0":"2",
+                        "GigabitEthernet4/0":"9"
                     }
                 },
                 {
@@ -21,7 +22,8 @@
                         "FastEthernet0/0":"",
                         "GigabitEthernet1/0":"1",
                         "GigabitEthernet2/0":"3",
-                        "GigabitEthernet3/0":""
+                        "GigabitEthernet3/0":"",
+                        "GigabitEthernet4/0":""
                     }
                 },
                 {
@@ -31,7 +33,8 @@
                         "FastEthernet0/0":"",
                         "GigabitEthernet1/0":"2",
                         "GigabitEthernet2/0":"4",
-                        "GigabitEthernet3/0":""
+                        "GigabitEthernet3/0":"",
+                        "GigabitEthernet4/0":""
                     }
                 },
                 {
@@ -41,7 +44,8 @@
                         "FastEthernet0/0":"",
                         "GigabitEthernet1/0":"3",
                         "GigabitEthernet2/0":"",
-                        "GigabitEthernet3/0":""
+                        "GigabitEthernet3/0":"",
+                        "GigabitEthernet4/0":"9"
                     }
                 },
                 {
@@ -50,8 +54,9 @@
                     "connecte": {
                         "FastEthernet0/0":"",
                         "GigabitEthernet1/0": "1",
-                        "GigabitEthernet2/0": "2",
-                        "GigabitEthernet3/0": ""
+                        "GigabitEthernet2/0": "4",
+                        "GigabitEthernet3/0": "",
+                        "GigabitEthernet4/0":""
                     }
                 }
             ]
@@ -68,7 +73,8 @@
                     "connecte": {
                         "FastEthernet0/0":"",
                         "GigabitEthernet2/0":"",
-                        "GigabitEthernet3/0":""
+                        "GigabitEthernet3/0":"",
+                        "GigabitEthernet4/0":""
                     }
                 }
             ]
@@ -85,7 +91,8 @@
                     "connecte": {
                         "FastEthernet0/0":"",
                         "GigabitEthernet2/0":"",
-                        "GigabitEthernet3/0":""
+                        "GigabitEthernet3/0":"",
+                        "GigabitEthernet4/0":""
                     }
                 }
             ]
@@ -101,7 +108,9 @@
                     "id_routeur": "7",
                     "connecte": {
                         "FastEthernet0/0":"",
-                        "GigabitEthernet1/0":""
+                        "GigabitEthernet2/0":"",
+                        "GigabitEthernet3/0":"",
+                        "GigabitEthernet4/0":""
                     }
                 }
             ]
@@ -118,7 +127,8 @@
                     "connecte": {
                         "FastEthernet0/0":"",
                         "GigabitEthernet2/0":"",
-                        "GigabitEthernet3/0":""
+                        "GigabitEthernet3/0":"",
+                        "GigabitEthernet4/0":""
                     }
                 }
             ]
