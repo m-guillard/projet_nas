@@ -259,7 +259,7 @@ def invariable_milieu():
     """
     txt_routeur = "ip forward-protocol nd\n"
     txt_routeur += point_excl(2)
-    txt_routeur += "no ip http server\nno ip http secure-server\n!\n"
+    txt_routeur += "no ip http server\nno ip http secure-server\n"
     return txt_routeur
 
 def invariable_fin():
@@ -492,7 +492,7 @@ def bgp(nom_routeur, voisins, routeur_dans_as, nom_as, routeur_bordure, dico_nom
         for v in infos_vrf:
             if v["AS_voisin"] == "Inter-AS":
                 id_as = [k for k,valeur in routeur_dans_as.items() if v["nom_voisin"] in valeur][0]
-                txt_routeur += " address-family ipv4 vrf "+ v["nom"] + "\n  redistribute connected\n"
+                txt_routeur += " address-family ipv4 vrf "+ v["nom"] + "\n"
                 txt_routeur += "  neighbor " + v["adresse_voisin"] + " remote-as " + id_as + "\n"
                 txt_routeur += "  neighbor " + v["adresse_voisin"] + " activate\n"
                 txt_routeur += " exit-address-family\n!\n"
