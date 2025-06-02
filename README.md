@@ -8,7 +8,7 @@ Le but de ce projet est d'automatiser la connexion entre les routeurs à partir 
 - Implémentation OSPFv2 au sein de l'AS et de BGP en Inter-AS
 - Configuration MP-BGP, LDP
 - Configuration des VRF
-- Drag and drop automatique des fichiers de configurations + Telnet
+- Drag and drop automatique des fichiers de configurations
 - Route reflection
 - Partage de VPN
 
@@ -16,13 +16,9 @@ Le but de ce projet est d'automatiser la connexion entre les routeurs à partir 
 ### Drag and drop automatique
 Pour lancer le projet : py main_sans_community.py INTENT_FILE_JSON CHEMIN_PROJET_GNS
 
-### Telnet
-1) Lancer main.py
-2) Lancer projet.py
-
 
 ## Contributeurs
 Anaïs DAGNET, Alice INVERNIZZI et Marion GUILLARD
 
-
+### Réseau de référence
 ![image](https://github.com/user-attachments/assets/811c3436-3d74-4b45-89ba-5faec7ea9774)
