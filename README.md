@@ -1,27 +1,28 @@
-# projet_nas
+# Projet NAS - Automatisation du réseau
 
-## TO-DO
-- Ajouter fonctionnalité
-    - Revoir adressage ipv4 Loopback/classique
-    - eBGP que sur les Loopback des ASBR
-    - modifier iBGP
-    - RR
-    - mpls ip dans les interfaces
-    - address-family vpn
-    - address-family ipv4/vrf ==> checj avec : PE/CE = si y'a du eBGP, sinon c'est des P, et pour différencier PE et CE : PE a des vrfet pas CE
- 
+## Description du projet
+Le but de ce projet est d'automatiser la connexion entre les routeurs à partir d'un fichier d'intention. C'est la continuité du projet GNS. En plus, de ce dernier, on fournit des services BGP/MPLS.
 
-    - attention commentaires de la magouille intersidérale
+## Fontionnalités implémentées
+- Adressage automatique en IPV4 (adresse physique et adresse de Loopback)
+- Implémentation OSPFv2 au sein de l'AS et de BGP en Inter-AS
+- Configuration MP-BGP, LDP
+- Configuration des VRF
+- Drag and drop automatique des fichiers de configurations + Telnet
+- Route reflection
+- Partage de VPN
 
-## Pour tester
-- Test effectué avec config_test.zip avec le fichier d'intention intent_network.json
+## Lancer le projet
+### Drag and drop automatique
+Pour lancer le projet : py main_sans_community.py INTENT_FILE_JSON CHEMIN_PROJET_GNS
 
-## Erreurs à corriger/Tests effectués
-- Ping impossible de PE à CE mais possible de CE à PE
-- Ping impossible entre deux CE d'un mm client
-- Ping entre les PE et les P
-- Erreurs dans terminal : ligne exit-address-family (je comprends pas d'où ça vient)
+### Telnet
+1) Lancer main.py
+2) Lancer projet.py
 
+
+## Contributeurs
+Anaïs DAGNET, Alice INVERNIZZI et Marion GUILLARD
 
 
 ![image](https://github.com/user-attachments/assets/811c3436-3d74-4b45-89ba-5faec7ea9774)
