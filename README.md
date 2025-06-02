@@ -19,6 +19,3 @@ Pour lancer le projet : py main_sans_community.py INTENT_FILE_JSON CHEMIN_PROJET
 
 ## Contributeurs
 Anaïs DAGNET, Alice INVERNIZZI et Marion GUILLARD
-
-### Réseau de référence
-![image](https://github.com/user-attachments/assets/811c3436-3d74-4b45-89ba-5faec7ea9774)
